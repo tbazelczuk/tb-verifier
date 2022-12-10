@@ -12,7 +12,7 @@ var options = {
   maxAge: '1m',
   redirect: false
 }
-app.use(express.static('build', options))
+app.use(express.static('dist', options))
 
 const port = process.env.PORT || 3000
 
