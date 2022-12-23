@@ -15,25 +15,16 @@ function formatDate(date) {
     [
       padTo2Digits(date.getHours()),
       padTo2Digits(date.getMinutes()),
-      padTo2Digits(date.getSeconds()),
     ].join(':')
   );
 }
 
+const fetchStatus = async () => (await fetch('/api/status')).json();
 const fetchData = async () => (await fetch('/api/sites')).json();
 
 function App() {
+  const [status] = createResource(fetchStatus);
   const [data] = createResource(fetchData);
-
-  // const sites = data.map((item) => {
-  //   return {
-  //     url: item.url,
-  //     value: item.value,
-  //     updated_at: new Date(item.updated_at)
-  //   }
-  // }).sort((a, b) => {
-  //   return b.updated_at - a.updated_at
-  // })
 
   return (
     <>
@@ -49,6 +40,12 @@ function App() {
             <div>{(item.history || []).map((h) => h.value).join(', ')}</div>
           </>
         }</For>
+      </div>
+      <div>
+        <a href="/api/fetch">fetch</a>
+        <Show when={status()}>
+          <span class="status">{formatDate(new Date(status().updated_at))} - {status().count}</span>
+        </Show>
       </div>
     </>
   );

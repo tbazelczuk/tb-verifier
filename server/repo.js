@@ -38,6 +38,7 @@ const fetchAll = async () => {
 
     console.log("updated items", items.length);
 
+    await updateStatus(items.length);
     await sendNotification(items)
 
     return items;
@@ -51,8 +52,12 @@ const deleteById = (_id) => model.deleteById(_id);
 const update = (site) => model.update(site);
 const save = (site) =>  model.save(site);
 const getAll = () => model.getAll();
+const getStatus = () => model.getStatus();
+const updateStatus = (count) => model.updateStatus(count);
 
 module.exports = {
+    getStatus,
+    updateStatus,
     fetchAndSave,
     fetchAll,
     fetch,

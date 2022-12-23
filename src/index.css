@@ -12,9 +12,25 @@ code {
     monospace;
 }
 
-.grid {
+body {
   padding: 20px;
+}
+
+.grid {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr 4fr;
   row-gap: 20px;
+  column-gap: 10px;
+  margin-bottom: 20px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  font-weight: 600;
 }

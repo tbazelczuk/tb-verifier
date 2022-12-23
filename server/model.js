@@ -1,22 +1,26 @@
 const mongoose = require("mongoose");
 
-const uristring =
-  process.env.MONGODB_URI || "mongodb://localhost/HelloMongoose";
+const uristring = process.env.MONGODB_URI || "mongodb://localhost/HelloMongoose";
 
-var NewsSchema = new mongoose.Schema(
-  {
-    url: String,
-    value: String,
-    title: String,
-    selector: String,
-    history: [],
-  },
-  {
-    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  }
-);
+const NewsSchema = new mongoose.Schema({
+  url: String,
+  value: String,
+  title: String,
+  selector: String,
+  history: [],
+}, {
+  timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+});
 
 const NewsModel = mongoose.model("News", NewsSchema);
+
+const StatusSchema = new mongoose.Schema({
+  count: Number,
+}, {
+  timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+});
+
+const StatusModel = mongoose.model("Status", StatusSchema);
 
 mongoose.set('strictQuery', false)
 
@@ -120,6 +124,17 @@ function deleteById(_id) {
   return NewsModel.findByIdAndDelete(_id)
 }
 
+async function updateStatus(count) {
+  const model = new StatusModel({ count });
+  const doc = await model.save()
+  return doc
+}
+
+async function getStatus() {
+  const doc = await StatusModel.findOne(null, ['-_id', 'count', 'updated_at'], { sort: { updated_at: -1 } })
+  return doc._doc
+}
+
 module.exports = {
   disconnect,
   connect,
@@ -129,4 +144,6 @@ module.exports = {
   update,
   // TODO: rename to findAll
   getAll,
+  getStatus,
+  updateStatus,
 };
