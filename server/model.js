@@ -56,56 +56,36 @@ const shouldUpdate = (item, doc) => {
 };
 
 async function save(item) {
-  return new Promise((resolve, reject) => {
-    const { url } = item;
+  const { url } = item;
+  const doc = await NewsModel.findOne({ url })
 
-    NewsModel.findOne({ url })
-      .then((doc) => {
-        if (!doc) {
-          const model = new NewsModel(item);
-          model
-            .save()
-            .then((doc) => {
-              console.log("succeess saved", doc);
-              resolve({
-                ...doc._doc,
-                newFlag: true
-              });
-            })
-            .catch((err) => {
-              console.log(err);
-              reject();
-            });
-        } else if (shouldUpdate(item, doc)) {
-          NewsModel.findOneAndUpdate({ url }, {
-            value: item.value,
-            history: [...doc.history, {
-              created_at: new Date(),
-              value: item.value
-            }]
-          }, { new: true })
-            .then((newDoc) => {
-              console.log("succeess updated", newDoc);
-              resolve({
-                ...newDoc._doc,
-                prevItem: doc._doc,
-                updateFlag: true
-              });
-            })
-            .catch((err) => {
-              console.log(err);
-              reject();
-            });
-        } else {
-          console.log("nothing to change", doc.url, doc.value);
-          reject();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        reject();
-      });
-  });
+  if (!doc) {
+    const model = new NewsModel(item);
+    const doc = await model.save()
+    console.log("succeess saved", doc);
+    return {
+      ...doc._doc,
+      newFlag: true
+    };
+  } else if (shouldUpdate(item, doc)) {
+    const history = doc.history ? doc.history : [];
+    const newDoc = await NewsModel.findOneAndUpdate({ url }, {
+      value: item.value,
+      history: [...history, {
+        created_at: new Date(),
+        value: doc.value
+      }],
+    }, { new: true })
+    console.log("succeess updated", newDoc);
+    return {
+      ...newDoc._doc,
+      prevItem: doc._doc,
+      updateFlag: true
+    };
+  }
+
+  console.log("nothing to change", doc.url, doc.value);
+  return doc._doc;
 }
 
 async function update(item) {

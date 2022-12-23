@@ -32,7 +32,9 @@ const fetchAll = async () => {
     }
 
     const results = await Promise.allSettled(promises);
-    const items = results.filter((result) => result.status === "fulfilled").map((result) => result.value);
+    const items = results.filter((result) => result.status === "fulfilled")
+        .map((result) => result.value)
+        .filter((item) => item.newFlag || item.updateFlag);
 
     console.log("updated items", items.length);
 
